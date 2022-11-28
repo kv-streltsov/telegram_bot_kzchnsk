@@ -1,72 +1,80 @@
 const dateConverter = require('./dateConvert.cjs')
-const postSort = require('./sortPost.cjs')
-
-const easyvk = require('easyvk')
-const path = require('path');
-
+const getWall = require('./getWall.cjs')
+const easyvkInit = require('./vkinit.cjs')
+const vk = easyvkInit()
 
 
-function getRide(){
-    return new Promise((resolve, reject) => {
-        let rideData = {}
-        let ride_list = []
 
-        easyvk({
-            username: '89059971441',
-            password: '3230sas',
-            sessionFile: path.join(__dirname, '.my-session')
-        })
-        .then(async vk => {
-            let vkr = await vk.call('wall.get', {
-                owner_id: -170319700,
-                count: 50});
+
+async function getRide(){
+    
+    let objectPost = {
+        kzc:[],
+        ens:[]
+    }
+
+
+    const objectWall = await getWall()
+
+    const kzc_list = objectWall.kzc
+    const ens_list = objectWall.ens
+
+
+    const list_promises_kzc = kzc_list.map(async (element,index) =>{
+        setTimeout(() => {
+            return vk.then(async vk => {
+            let user_domain = await vk.call('users.get', {
+                user_ids: element.signer_id,
+                fields: ['domain']});
             
-            let post_list = postSort(vkr)
 
-           
-            let interval = 600
-            let promise = Promise.resolve();
-
-            post_list.forEach((element,index) => {
-                  promise = promise.then(()=>{
-
-                        let user_get = vk.call('users.get', {
-                            user_ids: element.signer_id,
-                            fields: ['domain']});
-                            
-                        user_get.then(value =>{
-
-                            try {
-                                rideData = {
-                                    text : element.text,
-                                    date : dateConverter(element.date),
-                                    signer : value[0].domain
-                                }
-                            } catch (error) {
-                                console.log(error)
-                            } finally{
-                                ride_list.push(rideData)
-                            }                                
-                        })
-
-                        return new Promise(resolve => {
-                            setTimeout(resolve, interval);
-                        });
-                  })
-              });
-
-            promise.then(()=>{
-                resolve(ride_list)  
+            try {
+                rideData = {                                
+                    text : element.text,
+                    date : dateConverter(element.date),
+                    signer : user_domain[0].domain
+                }
+                
+            } catch (error) {
+                console.log(error)
+            } finally {
+                objectPost.kzc.push(rideData)
+            }
             })
-        })
+        }, 400*index);
+
     })
+
+    const list_promises_ens = ens_list.map(async (element,index) =>{
+        setTimeout(() => {
+            
+            return vk.then(async vk => {
+                let user_domain = await vk.call('users.get', {
+                    user_ids: element.from_id,
+                    fields: ['domain']});
+                
+    
+                try {
+                    rideData = {                                
+                        text : element.text,
+                        date : dateConverter(element.date),
+                        signer : user_domain[0].domain
+                    }
+                    
+                } catch (error) {
+                    console.log(error)
+                } finally {
+                    objectPost.ens.push(rideData)
+                }
+            })
+
+        }, 400*index);
+        
+
+    })
+
+    return Promise.all(list_promises_kzc,list_promises_ens)
+        .then(() => objectPost)
 }
 
 module.exports = getRide;
-
-
-
-
-
-
-

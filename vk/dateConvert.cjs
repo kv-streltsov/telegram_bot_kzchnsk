@@ -1,4 +1,5 @@
 function dateConverter(unix_time) {
+
   let date = new Date(unix_time * 1000);
 
   let day = date.getDate();
@@ -9,6 +10,7 @@ function dateConverter(unix_time) {
 
   let formattedTime = day + '.' + month + '.' + year + ' ' + hours + ':' + minutes.substr(-2);
   return formattedTime;
+  
 }
 
 module.exports = dateConverter;

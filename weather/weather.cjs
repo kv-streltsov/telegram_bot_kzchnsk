@@ -1,3 +1,4 @@
+const user = require('../login')
 let url = 'https://api.weather.yandex.ru/v2/informers?lat=57.695769&lon=93.275490&lang=ru_RU'
 
 let condition_obj	={
@@ -28,7 +29,7 @@ function getWeather(){
         fetch(url,{
             method: 'GET',
             headers: {
-                'X-Yandex-API-Key': '4e19b64e-3423-4829-b56e-813fd9a139ba'
+                'X-Yandex-API-Key': user.yandex_token
         }
         }).then(resp => resp.json()).then(res => {
             try {

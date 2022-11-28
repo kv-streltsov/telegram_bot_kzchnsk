@@ -2,9 +2,10 @@
 const getRide = require('./vk/getRide.cjs')
 const getWeather = require('./weather/weather.cjs')
 const insertPerson = require('./db/db')
+const user = require('./login')
 
 const TelegramBot = require('node-telegram-bot-api');
-const token = '5749407303:AAEKI8eTLcpkRMZfZu7Z2muDURlX0lbw-h0';
+const token = user.telegram_token;
 const bot = new TelegramBot(token, { polling: true });
 
 

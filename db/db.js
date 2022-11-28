@@ -1,12 +1,12 @@
-// const e = require('express')
+const user = require('../login')
 const { Client } = require('pg')
 
 const client = new Client({
-    user: 'postgres',
-    host:'localhost',
-    database:'telegram_bot',
-    password:'3230',
-    port:5432
+    port:     user.db.port,
+    user:     user.db.user,
+    host:     user.db.host,
+    database: user.db.database,
+    password: user.db.password
 })
 
 client.connect()

@@ -58,7 +58,7 @@ function filterWall(post,id){
                         }
                 })
                 //фильтруем уникальные значения (сделать отдельную функцию и понять как это работает)
-                let post_kcz = post_list_ens.reduce((acc, city) => {
+                let post_kcz = post_list_kzc.reduce((acc, city) => {
                     if (acc.map[city.text]) // если данный город уже был
                       return acc; // ничего не делаем, возвращаем уже собранное
                 

@@ -5,8 +5,8 @@ let check_list = [
     'красноярск-казачинское.',
     'казачинское-красноярск.',
     'казачинское-красноярск',
-    'казачинское',
-    'красноярска',
+    'казачинск',
+    'красноярск',
     'казачинское-',
     '-казачинское',
     'завтра',
@@ -33,11 +33,11 @@ let check_list_exc = [
     'аренда']
 
 
+
 function filterWall(post,id){
 
     let post_list_kzc = []
     let post_list_ens = []
-
     switch (id) {
 
         //filter kzc.
@@ -57,7 +57,21 @@ function filterWall(post,id){
                                 }
                         }
                 })
-                return post_list_kzc       
+                //фильтруем уникальные значения (сделать отдельную функцию и понять как это работает)
+                let post_kcz = post_list_ens.reduce((acc, city) => {
+                    if (acc.map[city.text]) // если данный город уже был
+                      return acc; // ничего не делаем, возвращаем уже собранное
+                
+                    acc.map[city.text] = true; // помечаем город, как обработанный
+                    acc.cities.push(city); // добавляем объект в массив городов
+                    return acc; // возвращаем собранное
+                  }, {
+                    map: {}, // здесь будут отмечаться обработанные города
+                    cities: [] // здесь конечный массив уникальных городов
+                  })
+                  .cities; // получаем конечный массив
+                
+                return post_kcz         
             
         //filter ens.
         case -42383055:
@@ -76,7 +90,23 @@ function filterWall(post,id){
                                 }
                         }
                 })
-                return post_list_ens       
+                //фильтруем уникальные значения 
+                let post_ens = post_list_ens.reduce((acc, city) => {
+                    if (acc.map[city.text]) // если данный город уже был
+                      return acc; // ничего не делаем, возвращаем уже собранное
+                
+                    acc.map[city.text] = true; // помечаем город, как обработанный
+                    acc.cities.push(city); // добавляем объект в массив городов
+                    return acc; // возвращаем собранное
+                  }, {
+                    map: {}, // здесь будут отмечаться обработанные города
+                    cities: [] // здесь конечный массив уникальных городов
+                  })
+                  .cities; // получаем конечный массив
+                
+                return post_ens   
+
+
 
     }
 }

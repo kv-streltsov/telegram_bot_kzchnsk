@@ -1,38 +1,40 @@
-const easyvkInit = require('./vkinit.cjs')
 const filterWall = require('./filterWall.cjs')
-const vk = easyvkInit()
 
-group_list = [-170319700,-42383055]
+// const easyvkInit = require('./vkinit.cjs')
+// const vk = easyvkInit()
 
-async function getWall() {
+group_list = [-170319700, -42383055]
+
+async function getWall(vk) {
 
     let wall = {
-        kzc:[],
-        ens:[]
+        kzc: [],
+        ens: []
     }
 
     const listPromises = group_list.map(async element => {
 
-        return vk.then(async vk => {    
+        return vk.then(async vk => {
             let wall_list = await vk.call('wall.get', {
                 owner_id: element,
-                count: 50})
+                count: 50
+            })
 
-                switch (element) {
-                    //filter kzc.
-                    case -170319700:
-                        wall.kzc =  filterWall(wall_list,element)
-                        break;
+            switch (element) {
+                //filter kzc.
+                case -170319700:
+                    wall.kzc = filterWall(wall_list, element)
+                    break;
 
-                     //filter ens.
-                    case -42383055:
-                        wall.ens =  filterWall(wall_list,element)
-                        break;
-                }
-        }) 
+                //filter ens.
+                case -42383055:
+                    wall.ens = filterWall(wall_list, element)
+                    break;
+            }
+        })
     });
 
     return Promise.all(listPromises).then(() => wall)
 }
- 
+
 module.exports = getWall;

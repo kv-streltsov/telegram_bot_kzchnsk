@@ -1,37 +1,48 @@
-//const downloadFile = require('./my_modules/downloadFile.cjs')
-const getRide = require('./vk/getRide.cjs')
-const getWeather = require('./weather/weather.cjs')
 const insertPerson = require('./db/db')
+const easyvkInit = require('./vk/vkinit.cjs')
+const getWeather = require('./weather/weather.cjs')
+const getRide = require('./vk/getRide.cjs')
 const user = require('./login')
 
 const TelegramBot = require('node-telegram-bot-api');
 const token = user.telegram_token;
 const bot = new TelegramBot(token, { polling: true });
 
+const vk = easyvkInit()
+
 
 let stickerId = 'CAACAgIAAxkBAAEGZvBjcJVpuKLB6JYqG0ryrjT_jnn4BAACTQADrWW8FPa2bPRlMeYaKwQ' //стикер дорога, потос делать список и рандомный выбор перед отправкой 
-let promisDataRide = getRide() // получаем попутки при старте бота
-// let weatherPromis = getWeather() // получаем погоду при старте бота
+let promisDataRide = getRide(vk) // получаем попутки при старте бота
+let weatherPromis = getWeather() // получаем погоду при старте бота
 
+let count_callback_query = 0
 //обработка кнопки для показа попуток енисейкск-красноярск
 bot.on('callback_query', query => {
     let id = query.message.chat.id
-    promisDataRide.then(value => {
+    if (count_callback_query == 1) {
 
-        let data = new Array
-        data.push(value.ens);
+        count_callback_query = 0
+        promisDataRide.then(value => {
 
-        for (let index = 0; index < data[0].length; index++) {
-            let text = data[0][index].text +
-                '\n' + '\n' +
-                data[0][index].date +
-                '\n' + 'https://vk.com/' +
-                data[0][index].signer
+            let data = new Array
+            data.push(value.ens);
 
-            bot.sendMessage(id, text,
-                { disable_web_page_preview: true })
-        }
-    })
+            for (let index = 0; index < data[0].length; index++) {
+                let text = data[0][index].text +
+                    '\n' + '\n' +
+                    data[0][index].date +
+                    '\n' + 'https://vk.com/' +
+                    data[0][index].signer
+
+                bot.sendMessage(id, text,
+                    { disable_web_page_preview: true })
+            }
+
+        })
+    }
+
+
+
 })
 
 
@@ -51,7 +62,7 @@ const opts = {
 
 // с интервалом обновляем данные попуток и погоды
 setInterval(() => {
-    promisDataRide = getRide()
+    promisDataRide = getRide(vk)
 }, 1000 * 60 * 5);
 
 setInterval(() => {
@@ -102,7 +113,7 @@ bot.on('message', msg => {
 
     if (text === '/ride') {
 
-
+        count_callback_query = 1
         bot.sendMessage(id, 'Один момент...')
         setTimeout(() => { bot.sendSticker(id, stickerId) }, 500);
 
@@ -140,6 +151,7 @@ bot.on('message', msg => {
                 }
 
                 setTimeout(() => {
+                    count_callback_query
                     bot.sendMessage(id, 'Показать еще?', opts);
                 }, 1500);
             })

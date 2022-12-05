@@ -6,18 +6,26 @@ const user = require('../login')
 
 
 
-function easyvkInit(){
-    return new Promise((resolve, reject) => {
-        easyvk({
-            username: user.vk.login,
-            password: user.vk.pass,
-            sessionFile: path.join(__dirname, '.my-session')
-        })
-        .then(async vk => {
-            resolve(vk)
-        })
-    })
-   
-}
+function easyvkInit() {
 
+    try {
+        return new Promise((resolve, reject) => {
+            easyvk({
+                username: user.vk.login,
+                password: user.vk.pass,
+                sessionFile: path.join(__dirname, '.my-session')
+            })
+                .then(async vk => {
+                    resolve(vk)
+                })
+        })
+    }
+
+    catch (error) {
+        console.log(error)
+    }
+
+
+}
+easyvkInit()
 module.exports = easyvkInit;

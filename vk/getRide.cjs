@@ -1,12 +1,12 @@
 const dateConverter = require('./dateConvert.cjs')
 const getWall = require('./getWall.cjs')
-const easyvkInit = require('./vkinit.cjs')
-const vk = easyvkInit()
+// const easyvkInit = require('./vkinit.cjs')
+// const vk = easyvkInit()
 
 
 
 
-async function getRide(){
+async function getRide(vk){
     
     let objectPost = {
         kzc:[],
@@ -14,7 +14,7 @@ async function getRide(){
     }
 
 
-    const objectWall = await getWall()
+    const objectWall = await getWall(vk)
 
     const kzc_list = objectWall.kzc
     const ens_list = objectWall.ens

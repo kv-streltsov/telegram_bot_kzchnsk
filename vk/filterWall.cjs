@@ -1,5 +1,28 @@
 const dateConverter = require('./dateConvert.cjs')
 
+function dateAndCheckListFilter(hour,post){
+  let post_list = []
+    post.items.forEach(element => {
+    //проверка по ключевым словам в массивах check_list\check_list_exc    
+    const even = (i) => element.text.toLowerCase().indexOf(i) != -1;
+        if (check_list.some(even) && !check_list_exc.some(even)) {
+
+            //и проверка по дате
+            let today_date = new Date();
+            let post_date = new Date(element.date * 1000);
+            if (today_date - post_date < 3600000 * hour) {post_list.push(element)}
+        }
+    })
+    return post_list
+}
+
+function sortUniqueness(post_list){
+      let post_list_sort = post_list.reduce((acc,value)=>{
+          if (!acc.find(v => v.text == value.text)) {acc.push(value);}
+          return acc;
+      }, [])
+      return post_list_sort
+}
 
 let check_list = [
   'красноярск-казачинское.',
@@ -14,6 +37,7 @@ let check_list = [
 
 let check_list_exc = [
   'прода',
+  'ремонт',
   'куплю',
   'сниму',
   'занятия',
@@ -35,85 +59,38 @@ let check_list_exc = [
   'квартир',
   'вступить',
   'групп',
-  'ресниц']
+  'ресниц',
+  'строитель',
+  'мужск',
+  'женск',
+  'валенки',
+  'пояса',
+  'оптика',
+  'зрение']
 
 
-
-function filterWall(post, id) {
+module.exports = function filterWall(post, id) {
 
   let post_list_kzc = []
   let post_list_ens = []
+
   switch (id) {
 
     //filter kzc.
     case -170319700:
-      post.items.forEach(element => {
-        //проверка по ключевым словам в массивах check_list\check_list_exc      
 
-        const even = (i) => element.text.toLowerCase().indexOf(i) != -1;
-        if (check_list.some(even) && !check_list_exc.some(even)) {
+      post_list_kzc = dateAndCheckListFilter(36, post)
+      const post_kzc = sortUniqueness(post_list_kzc)
 
-          //берем посты за последние 2 суток
-          let today_date = new Date();
-          let post_date = new Date(element.date * 1000);
-
-          if (today_date - post_date < 129600000) {
-            post_list_kzc.push(element)
-          }
-        }
-      })
-      //фильтруем уникальные значения (сделать отдельную функцию и понять как это работает)
-      let post_kcz = post_list_kzc.reduce((acc, city) => {
-        if (acc.map[city.text]) // если данный город уже был
-          return acc; // ничего не делаем, возвращаем уже собранное
-
-        acc.map[city.text] = true; // помечаем город, как обработанный
-        acc.cities.push(city); // добавляем объект в массив городов
-        return acc; // возвращаем собранное
-      }, {
-        map: {}, // здесь будут отмечаться обработанные города
-        cities: [] // здесь конечный массив уникальных городов
-      })
-        .cities; // получаем конечный массив
-
-      return post_kcz
+      return post_kzc
 
     //filter ens.
     case -42383055:
-      post.items.forEach(element => {
-        //проверка по ключевым словам в массивах check_list\check_list_exc      
 
-        const even = (i) => element.text.toLowerCase().indexOf(i) != -1;
-        if (check_list.some(even) && !check_list_exc.some(even)) {
-
-          //берем посты сегодня
-          let today_date = new Date();
-          let post_data = dateConverter(element.date)
-
-          if (today_date.getDate() == post_data.split('.')[0]) {
-            post_list_ens.push(element)
-          }
-        }
-      })
-      //фильтруем уникальные значения 
-      let post_ens = post_list_ens.reduce((acc, city) => {
-        if (acc.map[city.text]) // если данный город уже был
-          return acc; // ничего не делаем, возвращаем уже собранное
-
-        acc.map[city.text] = true; // помечаем город, как обработанный
-        acc.cities.push(city); // добавляем объект в массив городов
-        return acc; // возвращаем собранное
-      }, {
-        map: {}, // здесь будут отмечаться обработанные города
-        cities: [] // здесь конечный массив уникальных городов
-      })
-        .cities; // получаем конечный массив
+      const post_list_ens = dateAndCheckListFilter(18, post)
+      const post_ens = sortUniqueness(post_list_ens)
 
       return post_ens
 
-
-
   }
 }
-
-module.exports = filterWall;

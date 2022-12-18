@@ -1,3 +1,4 @@
+const logFnc = require('../log/log')
 const filterWall = require('./filterWall.cjs')
 
 // const easyvkInit = require('./vkinit.cjs')
@@ -5,7 +6,7 @@ const filterWall = require('./filterWall.cjs')
 
 group_list = [-170319700, -42383055]
 
-async function getWall(vk) {
+module.exports = async function getWall(vk) {
 
     let wall = {
         kzc: [],
@@ -20,6 +21,7 @@ async function getWall(vk) {
                 count: 50
             })
 
+            logFnc(`GET WALL ${element}`)
             switch (element) {
                 //filter kzc.
                 case -170319700:
@@ -31,10 +33,12 @@ async function getWall(vk) {
                     wall.ens = filterWall(wall_list, element)
                     break;
             }
-        })
+        }).catch(err => {
+            console.log(err)
+            logFnc(`GET WALL ERROR====${err.message}`)})
     });
 
+    
+    logFnc(`RETURN WALL`)
     return Promise.all(listPromises).then(() => wall)
 }
-
-module.exports = getWall;

@@ -66,7 +66,11 @@ let check_list_exc = [
   'валенки',
   'пояса',
   'оптика',
-  'зрение']
+  'зрение',
+  'руководител',
+  'доxод',
+  'требуется',
+  'аптека']
 
 
 module.exports = function filterWall(post, id) {
